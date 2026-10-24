@@ -1,0 +1,50 @@
+{
+  "total_24h_kwh": 7793.8,
+  "peak_demand_kwh": 570.9,
+  "peak_time": "2025-05-19 14:00:00",
+  "n_flagged_hours": 6,
+  "flagged_hours": [
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00"
+  ],
+  "peak_drivers": [
+    "Peak campus building occupancy & classroom plug load"
+  ],
+  "action_plan": [
+    {
+      "subsystem": "Central Chiller Plant",
+      "priority": "HIGH",
+      "recommendation": "Stage Thermal Pre-Cooling (08:00 to 11:00)",
+      "technical_details": "Sub-cool primary lecture halls and high-thermal-mass concrete zones by 1.0\u00b0C to 1.5\u00b0C between 08:00 and 11:00. This shifts chiller electrical demand away from the high-tariff afternoon peak window."
+    },
+    {
+      "subsystem": "Air Handling Units (AHUs)",
+      "priority": "HIGH",
+      "recommendation": "Audit Supply Fan Static Pressure Setpoint",
+      "technical_details": "Reset AHU duct static pressure setpoint by -0.15 in. w.g. to allow variable frequency drives (VFDs) to ramp down safely without starving terminal VAV boxes."
+    },
+    {
+      "subsystem": "Terminal VAV Zones",
+      "priority": "MEDIUM",
+      "recommendation": "Implement +1.0\u00b0C Peak Demand Offset in Non-Critical Spaces",
+      "technical_details": "Temporarily widen temperature deadbands by +1.0\u00b0C in common atria, departmental corridors, and administrative offices during flagged peak hours to curb compressor staging."
+    },
+    {
+      "subsystem": "Lighting & Plug Loads",
+      "priority": "MEDIUM",
+      "recommendation": "Conduct Peripheral Lighting & Computer Lab Sweep",
+      "technical_details": "Remotely trigger low-power standby on instructional computer labs and sweep exterior decorative / unoccupied conference room lighting."
+    },
+    {
+      "subsystem": "Wet Labs & Fume Hoods",
+      "priority": "SAFETY ADVISORY",
+      "recommendation": "Verify Fume Hood Sashes are Lowered",
+      "technical_details": "Encourage lab researchers to lower variable air volume (VAV) fume hood sashes to minimum stop when unmonitored. Maintain all EH&S air change safety compliance."
+    }
+  ],
+  "governance_disclaimer": "OPERATIONAL NOTICE: This AI prototype generates predictive decision-support recommendations for campus facility personnel. It does not exert direct Supervisory Control and Data Acquisition (SCADA) or Building Automation System (BAS/BACnet) actuator override. All actions require manual review and physical verification by licensed operators."
+}
