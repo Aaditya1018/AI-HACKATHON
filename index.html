@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusGrid AI — Energy Consumption Forecasting</title>
+  <meta name="description" content="AI-powered campus building energy forecasting system. Predict electricity consumption, detect high-use periods, and optimize energy saving actions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-glow bg-glow-3"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 2L29 9V23L16 30L3 23V9L16 2Z" stroke="url(#logoGrad)" stroke-width="1.5" fill="rgba(99,102,241,0.1)"/>
+            <path d="M16 8L11 14H15L13 22L21 15H17L19 8H16Z" fill="url(#logoGrad2)"/>
+            <defs>
+              <linearGradient id="logoGrad" x1="3" y1="2" x2="29" y2="30" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#818cf8"/><stop offset="1" stop-color="#34d399"/>
+              </linearGradient>
+              <linearGradient id="logoGrad2" x1="11" y1="8" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#818cf8"/><stop offset="1" stop-color="#34d399"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-name">CampusGrid</span>
+          <span class="logo-tag">AI Energy Intelligence</span>
+        </div>
+      </div>
+      <nav class="nav-pills">
+        <button class="nav-pill active" data-section="forecast" id="nav-forecast">Forecast</button>
+        <button class="nav-pill" data-section="analysis" id="nav-analysis">Analysis</button>
+        <button class="nav-pill" data-section="insights" id="nav-insights">Insights</button>
+        <button class="nav-pill" data-section="model" id="nav-model">Model Info</button>
+      </nav>
+      <div class="header-status">
+        <div class="status-dot"></div>
+        <span>Live Model Active</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- FORECAST -->
+    <section class="section active" id="section-forecast">
+      <div class="hero-metrics">
+        <div class="metric-card metric-primary">
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value" id="val-mae">—</div>
+            <div class="metric-label">Model MAE (kWh)</div>
+            <div class="metric-sub" id="sub-mae">Mean Absolute Error</div>
+          </div>
+        </div>
+        <div class="metric-card metric-success">
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value" id="val-rmse">—</div>
+            <div class="metric-label">Model RMSE (kWh)</div>
+            <div class="metric-sub">Root Mean Square Error</div>
+          </div>
+        </div>
+        <div class="metric-card metric-warning">
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value" id="val-improvement">—</div>
+            <div class="metric-label">Better Than Baseline</div>
+            <div class="metric-sub">vs. prev-day same-hour</div>
+          </div>
+        </div>
+        <div class="metric-card metric-alert">
+          <div class="metric-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value" id="val-alerts">—</div>
+            <div class="metric-label">High-Use Alerts (24h)</div>
+            <div class="metric-sub">Forecast period flags</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card chart-main">
+        <div class="chart-header">
+          <div class="chart-title-group">
+            <h2 class="chart-title">24-Hour Energy Consumption Forecast</h2>
+            <p class="chart-subtitle">AI model prediction vs actual vs naive baseline — chronological test split, no future leakage</p>
+          </div>
+          <div class="chart-controls">
+            <div class="legend-items">
+              <div class="legend-item"><span class="legend-dot" style="background:#818cf8"></span><span>AI Forecast</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#34d399"></span><span>Actual</span></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span><span>Naive Baseline</span></div>
+              <div class="legend-item"><span class="legend-line" style="background:#ef4444"></span><span>High-Use Threshold</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-wrapper chart-lg">
+          <canvas id="forecastChart"></canvas>
+        </div>
+      </div>
+
+      <div class="dual-panel">
+        <div class="chart-card alert-panel">
+          <div class="chart-header">
+            <div class="chart-title-group">
+              <h2 class="chart-title">⚡ High-Use Period Alerts</h2>
+              <p class="chart-subtitle">Predicted peaks &gt; 90th percentile threshold with recommended actions</p>
+            </div>
+          </div>
+          <div class="alerts-list" id="alerts-list">
+            <div class="loading-pulse">Analyzing forecast data…</div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title-group">
+              <h2 class="chart-title">Model vs Baseline Errors</h2>
+              <p class="chart-subtitle">MAE &amp; RMSE comparison on 31-day chronological test</p>
+            </div>
+          </div>
+          <div class="chart-wrapper chart-sm">
+            <canvas id="errorChart"></canvas>
+          </div>
+          <div class="error-table" id="error-table"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANALYSIS -->
+    <section class="section" id="section-analysis">
+      <div class="section-header">
+        <h2>Full Test Period Analysis</h2>
+        <p>31-day chronological test period — model vs actual vs baseline</p>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title-group">
+            <h2 class="chart-title">Full Month Consumption Overlay</h2>
+            <p class="chart-subtitle">Complete test period: May 2018</p>
+          </div>
+          <div class="view-toggle">
+            <button class="view-btn active" id="btn-all" onclick="filterTestChart('all')">All</button>
+            <button class="view-btn" id="btn-week1" onclick="filterTestChart('week1')">Week 1</button>
+            <button class="view-btn" id="btn-week2" onclick="filterTestChart('week2')">Week 2</button>
+            <button class="view-btn" id="btn-week3" onclick="filterTestChart('week3')">Week 3</button>
+          </div>
+        </div>
+        <div class="chart-wrapper chart-xl">
+          <canvas id="testPeriodChart"></canvas>
+        </div>
+      </div>
+
+      <div class="dual-panel">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title-group">
+              <h2 class="chart-title">Average Hourly Load Profile</h2>
+              <p class="chart-subtitle">Mean consumption across all 24 hours (full dataset)</p>
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="hourlyChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title-group">
+              <h2 class="chart-title">Day-of-Week Energy Pattern</h2>
+              <p class="chart-subtitle">Average consumption by weekday</p>
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="weeklyChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title-group">
+            <h2 class="chart-title">Predicted vs. Actual Scatter Plot</h2>
+            <p class="chart-subtitle">Perfect prediction lies on the diagonal line — test period only</p>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="scatterChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSIGHTS -->
+    <section class="section" id="section-insights">
+      <div class="section-header">
+        <h2>Energy Saving Recommendations</h2>
+        <p>AI-generated insights and practical checks based on forecast patterns</p>
+      </div>
+      <div class="insights-grid" id="insights-grid"></div>
+
+      <div class="chart-card limitations-card">
+        <div class="chart-header">
+          <div class="chart-title-group">
+            <h2 class="chart-title">⚠️ Data Limitations &amp; Transparency</h2>
+            <p class="chart-subtitle">Honest assessment of model constraints and dataset assumptions</p>
+          </div>
+        </div>
+        <div class="limitations-grid">
+          <div class="limitation-item">
+            <div class="lim-icon lim-warning">🌡️</div>
+            <div class="lim-content">
+              <h4>No Real Temperature Data</h4>
+              <p>Temperature is approximated via a sinusoidal proxy based on month and hour. Actual weather measurements would significantly improve accuracy, especially during summer HVAC peaks.</p>
+            </div>
+          </div>
+          <div class="limitation-item">
+            <div class="lim-icon lim-info">🏢</div>
+            <div class="lim-content">
+              <h4>Residential ≠ Commercial</h4>
+              <p>The dataset originates from residential apartments. Campus buildings may differ—demand driven by lecture schedules, labs, servers, and events creates different consumption patterns.</p>
+            </div>
+          </div>
+          <div class="limitation-item">
+            <div class="lim-icon lim-warning">📊</div>
+            <div class="lim-content">
+              <h4>Missing Data Imputation</h4>
+              <p>Significant data gaps exist due to smart meter outages. Linear interpolation fills these gaps, potentially smoothing out real consumption spikes or troughs.</p>
+            </div>
+          </div>
+          <div class="limitation-item">
+            <div class="lim-icon lim-danger">🚪</div>
+            <div class="lim-content">
+              <h4>No Occupancy Sensor Data</h4>
+              <p>Occupancy is inferred from time-of-day heuristics (weekday 8am–10pm). Real occupancy sensors or room booking systems would significantly improve demand prediction.</p>
+            </div>
+          </div>
+          <div class="limitation-item">
+            <div class="lim-icon lim-info">⚙️</div>
+            <div class="lim-content">
+              <h4>Model Does NOT Control Equipment</h4>
+              <p>This AI system is a decision-support tool only. It identifies high-consumption periods and recommends practical checks. No direct connection to HVAC, lighting, or other systems.</p>
+            </div>
+          </div>
+          <div class="limitation-item">
+            <div class="lim-icon lim-warning">📅</div>
+            <div class="lim-content">
+              <h4>Temporal Distribution Shift</h4>
+              <p>The model trains on Dec 2016–Apr 2018 data. Accuracy may degrade over time as occupancy patterns, appliance mix, and climate change cause distributional drift.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODEL INFO -->
+    <section class="section" id="section-model">
+      <div class="section-header">
+        <h2>Model Architecture &amp; Methodology</h2>
+        <p>Technical details of the AI forecasting pipeline</p>
+      </div>
+
+      <div class="model-grid">
+        <div class="chart-card pipeline-card">
+          <div class="chart-header">
+            <div class="chart-title-group">
+              <h2 class="chart-title">Forecasting Pipeline</h2>
+              <p class="chart-subtitle">End-to-end data flow from raw meters to forecast</p>
+            </div>
+          </div>
+          <div class="pipeline-steps">
+            <div class="pipeline-step"><div class="step-num">01</div><div class="step-content"><h4>Raw Data Ingestion</h4><p>39 smart-meter CSV files · 5-second resolution · 3-phase voltage &amp; energy · Dec 2016 – Jun 2018</p></div></div>
+            <div class="pipeline-arrow">↓</div>
+            <div class="pipeline-step"><div class="step-num">02</div><div class="step-content"><h4>Aggregation &amp; Resampling</h4><p>Sum all apartment phase energy → hourly building kWh via mean resampling + linear interpolation for gaps</p></div></div>
+            <div class="pipeline-arrow">↓</div>
+            <div class="pipeline-step"><div class="step-num">03</div><div class="step-content"><h4>Feature Engineering</h4><p>Lag features (1h, 2h, 3h, 24h, 48h, 168h) · Rolling statistics (24h mean/std, 7d mean) · Calendar features · Temperature proxy · Occupancy flag</p></div></div>
+            <div class="pipeline-arrow">↓</div>
+            <div class="pipeline-step"><div class="step-num">04</div><div class="step-content"><h4>Chronological Train/Test Split</h4><p>Train: Jan 2017–Apr 2018 (11,496 hrs) · Test: May 2018 (744 hrs) · Zero future data leakage</p></div></div>
+            <div class="pipeline-arrow">↓</div>
+            <div class="pipeline-step"><div class="step-num">05</div><div class="step-content"><h4>Gradient Boosting Regressor</h4><p>200 estimators · Max depth 5 · Learning rate 0.08 · Ensemble of weak learners minimizing MSE loss</p></div></div>
+            <div class="pipeline-arrow">↓</div>
+            <div class="pipeline-step"><div class="step-num">06</div><div class="step-content"><h4>Alert Generation</h4><p>Hours with predicted consumption &gt; 90th percentile flagged · Contextual recommendations generated per time block</p></div></div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title-group">
+              <h2 class="chart-title">Feature Importances</h2>
+              <p class="chart-subtitle">GBR feature contribution scores (Gini impurity)</p>
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="featureChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title-group">
+            <h2 class="chart-title">Model Specification</h2>
+            <p class="chart-subtitle">Hyperparameters and training configuration</p>
+          </div>
+        </div>
+        <div class="specs-grid" id="specs-grid"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title-group">
+            <h2 class="chart-title">Monthly Energy Profile</h2>
+            <p class="chart-subtitle">Average hourly consumption by month — seasonal patterns in the data</p>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="monthlyChart"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-brand">CampusGrid AI — Campus Energy Intelligence System</p>
+      <p class="footer-note">⚠️ This system is a decision-support tool only. Predictions are statistical estimates based on historical consumption patterns and do not directly control any building equipment or infrastructure. For operational decisions, consult your facilities management team.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
